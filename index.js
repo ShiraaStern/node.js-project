@@ -1,21 +1,22 @@
 const express = require('express');
 const chalk = require('chalk');
 
-// ייבוא הראוטרים (הקבצים הנפרדים)
-const coursesRouter = require('./courses');
-const studentsRouter = require('./students');
+// ייבוא הראוטרים החדשים והמסודרים
+const coursesRouter = require('./routes/courses');
+const studentsRouter = require('./routes/students');
+const enrollmentsRouter = require('./routes/enrollments');
 
 const app = express();
 const PORT = 3000;
 
-// חובה: מאפשר לשרת לקרוא פורמט JSON שמגיע מפוסטמן (req.body)
 app.use(express.json());
 
-// חיבור הראוטרים לנתיבים הייעודיים שלהם
+// חיבור הראוטרים לנתיבים הראשיים שלהם
 app.use('/courses', coursesRouter);
 app.use('/students', studentsRouter);
+// הרישומים מופרדים כעת בצורה נקייה לישות משלהם!
+app.use('/enrollments', enrollmentsRouter);
 
-// נתיב ראשי לבדיקה בסיסית של השרת
 app.get('/', (req, res) => {
     res.json({
         status: "success",
@@ -24,7 +25,6 @@ app.get('/', (req, res) => {
     });
 });
 
-// הפעלת השרת
 app.listen(PORT, () => {
     console.log(chalk.blue.bold('--------------------------------------------------'));
     console.log(chalk.green.bold(`🚀 השרת עלה בהצלחה ומקשיב בכתובת: http://localhost:${PORT}`));
