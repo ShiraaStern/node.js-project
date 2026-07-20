@@ -11,8 +11,9 @@ function getCourseById(id) {
 function createCourse(name, description) {
     if (!name) return null;
     const courses = coursesData.getAll();
+    const maxId = courses.reduce((max, c) => (c.id > max ? c.id : max), 0);
     const newCourse = {
-        id: courses.length + 1,
+        id: maxId + 1,
         name,
         description: description || ''
     };
@@ -21,11 +22,12 @@ function createCourse(name, description) {
 
 function updateCourse(id, name, description) {
     const foundCourse = coursesData.getById(id);
-    if (!foundCourse || !name) return null;
+    if (!foundCourse) return { error: 'NOT_FOUND' };
+    if (!name) return { error: 'INVALID_DATA' };
 
     foundCourse.name = name;
-    foundCourse.description = description || foundCourse.description;
-    return foundCourse;
+    foundCourse.description = description !== undefined ? description : foundCourse.description;
+    return { data: foundCourse };
 }
 
 function deleteCourse(id) {

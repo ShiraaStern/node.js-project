@@ -11,8 +11,9 @@ function getStudentById(id) {
 function createStudent(name, email) {
     if (!name || !email) return null;
     const students = studentsData.getAll();
+    const maxId = students.reduce((max, s) => (s.id > max ? s.id : max), 0);
     const newStudent = {
-        id: students.length + 1,
+        id: maxId + 1,
         name,
         email
     };
@@ -21,11 +22,12 @@ function createStudent(name, email) {
 
 function updateStudent(id, name, email) {
     const foundStudent = studentsData.getById(id);
-    if (!foundStudent || !name || !email) return null;
+    if (!foundStudent) return { error: 'NOT_FOUND' };
+    if (!name || !email) return { error: 'INVALID_DATA' };
 
     foundStudent.name = name;
     foundStudent.email = email;
-    return foundStudent;
+    return { data: foundStudent };
 }
 
 function deleteStudent(id) {

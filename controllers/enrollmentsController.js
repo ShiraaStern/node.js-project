@@ -17,9 +17,10 @@ function handleCreate(req, res) {
 }
 
 function handleUpdate(req, res) {
-    const updated = enrollmentsService.updateRegistration(parseInt(req.params.id), req.body.studentId, req.body.courseId);
-    if (!updated) return res.status(400).json({ message: "הרישום לא נמצא או שחסרים שדות חובה" });
-    res.json(updated);
+    const result = enrollmentsService.updateRegistration(parseInt(req.params.id), req.body.studentId, req.body.courseId);
+    if (result.error === 'NOT_FOUND') return res.status(404).json({ message: "הרישום לא נמצא" });
+    if (result.error === 'INVALID_DATA') return res.status(400).json({ message: "חסרים שדות חובה" });
+    res.json(result.data);
 }
 
 function handleDelete(req, res) {

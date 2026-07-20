@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const enrollmentsController = require('../controllers/enrollmentsController');
 
-// שימי לב לתיקון הכתובות כדי שיתאימו ל-app.js החדש
-router.get('/all', enrollmentsController.handleGetAll);
+// מתוקן לנתיב הראשי של הראוטר
+router.get('/', enrollmentsController.handleGetAll);
 router.get('/:id', enrollmentsController.handleGetById);
 router.post('/', enrollmentsController.handleCreate);
 router.put('/:id', enrollmentsController.handleUpdate);

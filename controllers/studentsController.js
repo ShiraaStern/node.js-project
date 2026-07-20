@@ -1,31 +1,32 @@
-const studentsService = require('../services/studentsService');
+const coursesService = require('../services/coursesService');
 
 function handleGetAll(req, res) {
-    res.json(studentsService.getAllStudents());
+    res.json(coursesService.getAllCourses());
 }
 
 function handleGetById(req, res) {
-    const student = studentsService.getStudentById(parseInt(req.params.id));
-    if (!student) return res.status(404).json({ message: "התלמיד לא נמצא" });
-    res.json(student);
+    const course = coursesService.getCourseById(parseInt(req.params.id));
+    if (!course) return res.status(404).json({ message: "הקורס לא נמצא" });
+    res.json(course);
 }
 
 function handleCreate(req, res) {
-    const newStudent = studentsService.createStudent(req.body.name, req.body.email);
-    if (!newStudent) return res.status(400).json({ message: "שם ואימייל הם שדות חובה" });
-    res.status(201).json(newStudent);
+    const newCourse = coursesService.createCourse(req.body.name, req.body.description);
+    if (!newCourse) return res.status(400).json({ message: "שם הקורס הוא שדה חובה" });
+    res.status(201).json(newCourse);
 }
 
 function handleUpdate(req, res) {
-    const updated = studentsService.updateStudent(parseInt(req.params.id), req.body.name, req.body.email);
-    if (!updated) return res.status(400).json({ message: "התלמיד לא נמצא או שחסרים שדות חובה" });
-    res.json(updated);
+    const result = coursesService.updateCourse(parseInt(req.params.id), req.body.name, req.body.description);
+    if (result.error === 'NOT_FOUND') return res.status(404).json({ message: "הקורס לא נמצא" });
+    if (result.error === 'INVALID_DATA') return res.status(400).json({ message: "חסרים שדות חובה" });
+    res.json(result.data);
 }
 
 function handleDelete(req, res) {
-    const success = studentsService.deleteStudent(parseInt(req.params.id));
-    if (!success) return res.status(404).json({ message: "התלמיד לא נמצא" });
-    res.json({ message: "התלמיד נמחק בהצלחה" });
+    const success = coursesService.deleteCourse(parseInt(req.params.id));
+    if (!success) return res.status(404).json({ message: "הקורס לא נמצא" });
+    res.json({ message: "הקורס נמחק בהצלחה" });
 }
 
 module.exports = { handleGetAll, handleGetById, handleCreate, handleUpdate, handleDelete };

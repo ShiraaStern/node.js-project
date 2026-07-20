@@ -17,9 +17,10 @@ function handleCreate(req, res) {
 }
 
 function handleUpdate(req, res) {
-    const updated = coursesService.updateCourse(parseInt(req.params.id), req.body.name, req.body.description);
-    if (!updated) return res.status(400).json({ message: "הקורס לא נמצא או שחסרים שדות חובה" });
-    res.json(updated);
+    const result = coursesService.updateCourse(parseInt(req.params.id), req.body.name, req.body.description);
+    if (result.error === 'NOT_FOUND') return res.status(404).json({ message: "הקורס לא נמצא" });
+    if (result.error === 'INVALID_DATA') return res.status(400).json({ message: "חסרים שדות חובה" });
+    res.json(result.data);
 }
 
 function handleDelete(req, res) {

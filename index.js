@@ -1,7 +1,7 @@
 const express = require('express');
 const chalk = require('chalk');
 
-// ייבוא הראוטרים החדשים והמסודרים
+// ייבוא הראוטרים
 const coursesRouter = require('./routes/courses');
 const studentsRouter = require('./routes/students');
 const enrollmentsRouter = require('./routes/enrollments');
@@ -11,10 +11,34 @@ const PORT = 3000;
 
 app.use(express.json());
 
+// ==========================================
+// ה-Middleware של האימות (Authentication)
+// ==========================================
+const authenticateRequest = (req, res, next) => {
+    // הדפסה לטרמינל בשביל לוודא שהפונקציה נקראת בכל קריאה
+    console.log(chalk.yellow(`[LOG] Incoming request: ${req.method} ${req.url}`));
+
+    const SECRET_KEY = 'my-secret-123'; // הערך שקבענו לאימות
+    const clientKey = req.get('auth-key'); // שליפת ה-header
+
+    // בדיקה: אם לא נשלח header או שהערך שגוי -> מחזירים 401
+    if (!clientKey || clientKey !== SECRET_KEY) {
+        return res.status(401).json({
+            status: "error",
+            message: "Unauthorized. Missing or invalid auth-key header."
+        });
+    }
+
+    // אם הכל תקין, ממשיכים הלאה לראוטרים!
+    next();
+};
+
+// הפעלת ה-Middleware באופן גלובלי (לפני כל הראוטרים!)
+app.use(authenticateRequest);
+
 // חיבור הראוטרים לנתיבים הראשיים שלהם
 app.use('/courses', coursesRouter);
 app.use('/students', studentsRouter);
-// הרישומים מופרדים כעת בצורה נקייה לישות משלהם!
 app.use('/enrollments', enrollmentsRouter);
 
 app.get('/', (req, res) => {
