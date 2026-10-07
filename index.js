@@ -1,3 +1,5 @@
+require('dotenv').config(); // טוען את משתני הסביבה מקובץ .env
+
 const express = require('express');
 const chalk = require('chalk');
 
@@ -7,7 +9,7 @@ const studentsRouter = require('./routes/students');
 const enrollmentsRouter = require('./routes/enrollments');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
@@ -18,7 +20,7 @@ const authenticateRequest = (req, res, next) => {
     // הדפסה לטרמינל בשביל לוודא שהפונקציה נקראת בכל קריאה
     console.log(chalk.yellow(`[LOG] Incoming request: ${req.method} ${req.url}`));
 
-    const SECRET_KEY = 'my-secret-123'; // הערך שקבענו לאימות
+    const SECRET_KEY = process.env.SECRET_KEY; // הערך נטען ממשתני הסביבה
     const clientKey = req.get('auth-key'); // שליפת ה-header
 
     // בדיקה: אם לא נשלח header או שהערך שגוי -> מחזירים 401
