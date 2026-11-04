@@ -9,32 +9,26 @@ function getStudentById(id) {
 }
 
 function createStudent(name, email) {
-    if (!name || !email) return null;
-    const students = studentsData.getAll();
-    const maxId = students.reduce((max, s) => (s.id > max ? s.id : max), 0);
-    const newStudent = {
-        id: maxId + 1,
-        name,
-        email
-    };
-    return studentsData.add(newStudent);
+    if (!name || !email) return Promise.resolve(null);
+    return studentsData.getAll().then(students => {
+        const maxId = students.reduce((max, student) => (student.id > max ? student.id : max), 0);
+        const newStudent = { id: maxId + 1, name, email };
+        return studentsData.add(newStudent);
+    });
 }
 
 function updateStudent(id, name, email) {
-    const foundStudent = studentsData.getById(id);
-    if (!foundStudent) return { error: 'NOT_FOUND' };
-    if (!name || !email) return { error: 'INVALID_DATA' };
-
-    foundStudent.name = name;
-    foundStudent.email = email;
-    return { data: foundStudent };
+    if (!name || !email) return Promise.resolve({ error: 'INVALID_DATA' });
+    return studentsData.getById(id).then(foundStudent => {
+        if (!foundStudent) return { error: 'NOT_FOUND' };
+        foundStudent.name = name;
+        foundStudent.email = email;
+        return studentsData.update(foundStudent).then(() => ({ data: foundStudent }));
+    });
 }
 
 function deleteStudent(id) {
-    const index = studentsData.getIndex(id);
-    if (index === -1) return false;
-    studentsData.remove(index);
-    return true;
+    return studentsData.remove(id);
 }
 
 module.exports = { getAllStudents, getStudentById, createStudent, updateStudent, deleteStudent };

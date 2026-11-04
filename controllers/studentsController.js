@@ -1,32 +1,51 @@
-const coursesService = require('../services/coursesService');
+const studentsService = require('../services/studentsService');
+
+function handleServerError(res, error) {
+    console.error('Students controller error:', error);
+    res.status(500).json({ message: "שגיאת שרת בטיפול בתלמידים" });
+}
 
 function handleGetAll(req, res) {
-    res.json(coursesService.getAllCourses());
+    studentsService.getAllStudents()
+        .then(students => res.json(students))
+        .catch(error => handleServerError(res, error));
 }
 
 function handleGetById(req, res) {
-    const course = coursesService.getCourseById(parseInt(req.params.id));
-    if (!course) return res.status(404).json({ message: "הקורס לא נמצא" });
-    res.json(course);
+    studentsService.getStudentById(parseInt(req.params.id))
+        .then(student => {
+            if (!student) return res.status(404).json({ message: "התלמיד לא נמצא" });
+            res.json(student);
+        })
+        .catch(error => handleServerError(res, error));
 }
 
 function handleCreate(req, res) {
-    const newCourse = coursesService.createCourse(req.body.name, req.body.description);
-    if (!newCourse) return res.status(400).json({ message: "שם הקורס הוא שדה חובה" });
-    res.status(201).json(newCourse);
+    studentsService.createStudent(req.body.name, req.body.email)
+        .then(newStudent => {
+            if (!newStudent) return res.status(400).json({ message: "שם ואימייל הם שדות חובה" });
+            res.status(201).json(newStudent);
+        })
+        .catch(error => handleServerError(res, error));
 }
 
 function handleUpdate(req, res) {
-    const result = coursesService.updateCourse(parseInt(req.params.id), req.body.name, req.body.description);
-    if (result.error === 'NOT_FOUND') return res.status(404).json({ message: "הקורס לא נמצא" });
-    if (result.error === 'INVALID_DATA') return res.status(400).json({ message: "חסרים שדות חובה" });
-    res.json(result.data);
+    studentsService.updateStudent(parseInt(req.params.id), req.body.name, req.body.email)
+        .then(result => {
+            if (result.error === 'NOT_FOUND') return res.status(404).json({ message: "התלמיד לא נמצא" });
+            if (result.error === 'INVALID_DATA') return res.status(400).json({ message: "חסרים שדות חובה" });
+            res.json(result.data);
+        })
+        .catch(error => handleServerError(res, error));
 }
 
 function handleDelete(req, res) {
-    const success = coursesService.deleteCourse(parseInt(req.params.id));
-    if (!success) return res.status(404).json({ message: "הקורס לא נמצא" });
-    res.json({ message: "הקורס נמחק בהצלחה" });
+    studentsService.deleteStudent(parseInt(req.params.id))
+        .then(success => {
+            if (!success) return res.status(404).json({ message: "התלמיד לא נמצא" });
+            res.json({ message: "התלמיד נמחק בהצלחה" });
+        })
+        .catch(error => handleServerError(res, error));
 }
 
 module.exports = { handleGetAll, handleGetById, handleCreate, handleUpdate, handleDelete };

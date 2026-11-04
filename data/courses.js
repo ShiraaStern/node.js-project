@@ -1,13 +1,40 @@
-let courses = [
-    { id: 1, name: 'פיתוח Frontend ברמת מומחה', description: 'לימוד מעמיק של React ו-JavaScript' },
-    { id: 2, name: 'מבוא ל-Node.js ו-Backend', description: 'בניית שרתים, מערכת קבצים ופיתוח API' },
-    { id: 3, name: 'ארכיטקטורת ענן ו-DevOps', description: 'פריסת אפליקציות וניהול שרתים' }
-];
+const fs = require('fs').promises;
+const path = require('path');
 
-function getAll() { return courses; }
-function getById(id) { return courses.find(c => c.id === id); }
-function add(course) { courses.push(course); return course; }
-function remove(index) { courses.splice(index, 1); }
-function getIndex(id) { return courses.findIndex(c => c.id === id); }
+const coursesFile = path.join(__dirname, 'courses.json');
 
-module.exports = { getAll, getById, add, remove, getIndex };
+async function getAll() {
+    const contents = await fs.readFile(coursesFile, 'utf8');
+    return JSON.parse(contents);
+}
+
+async function getById(id) {
+    const courses = await getAll();
+    return courses.find(course => course.id === id);
+}
+
+async function add(course) {
+    const courses = await getAll();
+    courses.push(course);
+    await fs.writeFile(coursesFile, JSON.stringify(courses, null, 2));
+    return course;
+}
+
+async function update(course) {
+    const courses = await getAll();
+    const index = courses.findIndex(item => item.id === course.id);
+    if (index === -1) return false;
+    courses[index] = course;
+    await fs.writeFile(coursesFile, JSON.stringify(courses, null, 2));
+    return true;
+}
+
+async function remove(id) {
+    const courses = await getAll();
+    const filteredCourses = courses.filter(course => course.id !== id);
+    if (filteredCourses.length === courses.length) return false;
+    await fs.writeFile(coursesFile, JSON.stringify(filteredCourses, null, 2));
+    return true;
+}
+
+module.exports = { getAll, getById, add, update, remove };
