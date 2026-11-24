@@ -1,11 +1,11 @@
 const coursesData = require('../data/courses');
 
-function getAllCourses() {
-    return coursesData.getAll();
+async function getAllCourses() {
+    return await coursesData.getAll();
 }
 
-function getCourseById(id) {
-    return coursesData.getById(id);
+async function getCourseById(id) {
+    return await coursesData.getById(id);
 }
 
 async function createCourse(name, description) {
@@ -17,7 +17,7 @@ async function createCourse(name, description) {
         name,
         description: description || ''
     };
-    return coursesData.add(newCourse);
+    return await coursesData.add(newCourse);
 }
 
 async function updateCourse(id, name, description) {
@@ -27,11 +27,12 @@ async function updateCourse(id, name, description) {
 
     foundCourse.name = name;
     foundCourse.description = description !== undefined ? description : foundCourse.description;
-    return coursesData.update(foundCourse).then(() => ({ data: foundCourse }));
+    await coursesData.update(foundCourse);
+    return { data: foundCourse };
 }
 
 async function deleteCourse(id) {
-    return coursesData.remove(id);
+    return await coursesData.remove(id);
 }
 
 module.exports = { getAllCourses, getCourseById, createCourse, updateCourse, deleteCourse };
